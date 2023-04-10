@@ -29,7 +29,11 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan
-        ROOT_PATH: ${{ env.ROOT_PATH }}
+        
+      - name: Validate Terraform code
+        run: terraform validate
+        working-directory: ${{ env.ROOT_PATH }}
+
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
