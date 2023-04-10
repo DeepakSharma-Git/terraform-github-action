@@ -41,6 +41,7 @@ jobs:
   
     - name: terraform init
       run: terraform init
+      working-directory: ${{ env.ROOT_PATH }}
 
      - name: Terraform Format
       run: terraform fmt -check
@@ -48,12 +49,9 @@ jobs:
 
     - name: Terraform Plan
       run: terraform plan 
-     
-      #github.ref == 'refs/heads/main' && github.event_name == 'push'
-    - name: Terraform Apply
-      run: terraform apply -auto-approve
-      if: github.ref == 'refs/heads/main' && github.event_name = 'push'
-
+      working-directory: ${{ env.ROOT_PATH }}
+    
+    
     # - name: terraform destroy
     #   run: terraform destroy -auto-approve
     #   if: ${{inputs.tf_destroy}} == true
