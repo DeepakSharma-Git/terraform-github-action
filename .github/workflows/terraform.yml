@@ -1,4 +1,4 @@
-name: Terraform
+name: Terraform Deployment
 
 on:
   push:
@@ -13,37 +13,33 @@ env:
   ROOT_PATH: "."
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Azure CLI version
-         run: az --version
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.1.0
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.1.0
+    - name: Terraform Init
+      run: terraform init
 
-      - name: Terraform Init
-        run: terraform init
+    - name: Terraform Validate
+      run: |
+        terraform validate
+        terraform fmt --check --diff
 
-      - name: Validate Terraform code
-        run: |
-          terraform validate
-          terraform fmt -check -diff
-        working-directory: ${{ env.ROOT_PATH }}
+    - name: Terraform Plan
+      run: terraform plan
 
-      - name: Terraform Plan
-        run: terraform plan
-        
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
+    - name: Terraform Apply
+      run: terraform apply --auto-approve
